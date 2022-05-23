@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -119,9 +120,11 @@ private javax.swing.JButton btnCreateInv;
     }
 
     private void confirmCreatingLine() {
+        try{
         String itemName = invoiceLineDialog.getItemNameField().getText();
         String itemCountStr = invoiceLineDialog.getItemCountField().getText();
         String itemPriceStr = invoiceLineDialog.getItemPriceField().getText();
+        
         invoiceLineDialog.setVisible(false);
         invoiceLineDialog.dispose();
         invoiceLineDialog = null;
@@ -135,6 +138,14 @@ private javax.swing.JButton btnCreateInv;
         linesInvTableModel.fireTableDataChanged();
         headerInvTableModel.fireTableDataChanged();
         labelTotalInv.setText("" + invoice.getTotaIInv());
+        consolePrint();
+        }catch(NumberFormatException exception){
+                  JOptionPane.showMessageDialog(this, "Wrong date format", "Error", JOptionPane.ERROR_MESSAGE);
+
+                        
+                        }
+
+        
     }
 
     private void deleteInv() {
@@ -149,6 +160,7 @@ private javax.swing.JButton btnCreateInv;
         tFieldDateInv.setText("");
         labelNumInv.setText("");
         labelTotalInv.setText("");
+        consolePrint();
     }
 
     private void deleteLine() {
@@ -158,6 +170,7 @@ private javax.swing.JButton btnCreateInv;
         linesInvTableModel.fireTableDataChanged();
         headerInvTableModel.fireTableDataChanged();
         labelTotalInv.setText("" + line.getHeader().getTotaIInv());
+        consolePrint();
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -248,8 +261,18 @@ private javax.swing.JButton btnCreateInv;
                     tableInvoices.validate();
                 }
                 System.out.println("Check");
-            } catch (HeadlessException | IOException | NumberFormatException | ParseException ex) {
+            } catch (ParseException ex) {
                 ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Date Format Error\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Number Format Error\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "File Error\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Read Error\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -311,6 +334,8 @@ private javax.swing.JButton btnCreateInv;
         invoiceHeaderDialog.setVisible(false);
         invoiceHeaderDialog.dispose();
         invoiceHeaderDialog = null;
+        consolePrint();
+
     }
         //user clicked new invoice button then Confirm button , hide dialog , delete dialog
 
@@ -331,7 +356,9 @@ private javax.swing.JButton btnCreateInv;
             listInv.add(invoiceHeader);
             //notify listeners , show addedd row in line table
             headerInvTableModel.fireTableDataChanged();
+            consolePrint();
         } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, "Wrong date format", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -518,6 +545,12 @@ private javax.swing.JButton btnCreateInv;
     }
     
 
-    
+     private void consolePrint() {
+        System.out.println("***************************");
+        for (HeaderInv header : this.listInv) {
+            System.out.println(header);
+        }
+        System.out.println("***************************");
+    }
 
 }
